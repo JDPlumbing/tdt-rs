@@ -8,7 +8,8 @@ license = "MIT"
 repository = "https://github.com/JDPlumbing/tdt-rs"
 readme = "README.md"
 categories = ["date-and-time", "command-line-utilities"]
-keywords = ["time", "delta", "ticks", "clock", "epoch", "countdown"]
+keywords = ["time", "delta", "ticks", "countdown", "clock"]
+
 
 [dependencies]
 chrono = "0.4"
