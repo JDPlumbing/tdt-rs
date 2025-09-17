@@ -1,70 +1,115 @@
-# ⏱ Time Delta Toolkit (TDT)
+# TDT (Time Delta Toolkit)
 
-A Rust toolkit for working with **time deltas**.  
-Count ticks, break down elapsed time, pretty-print durations, or run a live ticking clock.  
+[![Crates.io](https://img.shields.io/crates/v/tdt.svg)](https://crates.io/crates/tdt)
+[![Documentation](https://docs.rs/tdt/badge.svg)](https://docs.rs/tdt)
+[![License](https://img.shields.io/crates/l/tdt.svg)](./LICENSE)
 
-TDT is compact, exact, and designed as both a **library** and a **CLI tool**.
-
----
-
-## 🚀 Install
-From crates.io:
-```bash
-cargo install tdt
-```
-
-From source:
-```bash
-git clone https://github.com/JDPlumbing/tdt.git
-cd tdt
-cargo install --path .
-```
+**Time Delta Toolkit (TDT)** — a tiny Rust library for measuring elapsed time between events.  
+Designed for simulations, games, and any system where you need fast, flexible time deltas.
 
 ---
 
-## 📌 Usage
+## ✨ Features
 
-### Since Epoch
+- **Simple API** with the `TimeDelta` struct
+- **Nanosecond-level precision** (via `chrono`)
+- Multiple constructors:
+  - `from_now()` — since epoch until now
+  - `between(start, end)` — between two datetimes
+  - `until_now(start)` — from a given datetime until now
+- Utilities:
+  - `.ticks(unit)` → elapsed in a unit (`days`, `hours`, `minutes`, `seconds`, `milliseconds`, `microseconds`, `nanoseconds`)
+  - `.pretty(max_units)` → human-readable breakdown like `"25 years, 3 months, 12 days"`
+
+---
+
+## 📦 Installation
+
 ```bash
-tdt since --unit seconds
-# → Ticks since 1970-01-01
+cargo add tdt
 ```
 
-### Between Dates
-```bash
-tdt between --start "1997-06-15 00:00:00" --end "2025-09-14 00:00:00"
-# → "28 years, 3 months, 0 days"
-```
+Or add manually to `Cargo.toml`:
 
-### Until Target Date
-```bash
-tdt until --target "2100-01-01 00:00:00" --unit days
-# → "Until 2100: 27393 days"
-```
-
-### Live Clock
-```bash
-tdt clock
-# → Since epoch: 1737283645s | 1737283645123ms | 1737283645123456µs
+```toml
+[dependencies]
+tdt = "0.1"
 ```
 
 ---
 
-## 🛠 Library Usage
+## 🔍 Example
+
 ```rust
 use chrono::Utc;
-use tdt::{count_ticks, pretty_breakdown};
+use tdt::core::TimeDelta;
 
 fn main() {
     let start = Utc::now();
-    let end = start + chrono::Duration::days(42);
+    let td = TimeDelta::until_now(start);
 
-    println!("Ticks in hours: {}", count_ticks(Some(start), Some(end), "hours"));
-    println!("Breakdown: {}", pretty_breakdown(start, Some(end), 3));
+    println!("Elapsed (seconds): {}", td.ticks("seconds"));
+    println!("Pretty: {}", td.pretty(3));
 }
 ```
+
+Output:
+```
+Elapsed (seconds): 42
+Pretty: 0 minutes, 42 seconds
+```
+
+---
+
+## 📖 API
+
+### `TimeDelta::from_now() -> TimeDelta`
+Construct a delta from the epoch (`1970-01-01 00:00:00 UTC`) until now.
+
+### `TimeDelta::between(start: DateTime<Utc>, end: DateTime<Utc>) -> TimeDelta`
+Construct a delta between two arbitrary datetimes.
+
+### `TimeDelta::until_now(start: DateTime<Utc>) -> TimeDelta`
+Construct a delta from a given datetime until now.
+
+### `TimeDelta::ticks(unit: &str) -> i64`
+Return elapsed time in the specified unit. Supported:
+`"days" | "hours" | "minutes" | "seconds" | "milliseconds" | "microseconds" | "nanoseconds"`
+
+### `TimeDelta::pretty(max_units: usize) -> String`
+Return a human-readable string breakdown, up to `max_units` parts.
+
+---
+
+## 🛠 Development
+
+Run tests:
+
+```bash
+cargo test
+```
+
+Run benchmarks:
+
+```bash
+cargo bench
+```
+
+Format code:
+
+```bash
+cargo fmt
+```
+
+---
+
+## 📎 Links
+- [Crates.io](https://crates.io/crates/tdt)
+- [Docs.rs](https://docs.rs/tdt)
+- [Source Code](https://github.com/JDPlumbing/tdt-rs)
 
 ---
 
 ## 📄 License
-MIT License © 2025 JD Plumbing
+
+MIT © JD Plumbing

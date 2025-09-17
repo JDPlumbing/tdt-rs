@@ -2,7 +2,7 @@ mod core;
 
 use chrono::{NaiveDateTime, Utc};
 use clap::{Parser, Subcommand};
-use core::{count_ticks, pretty_breakdown};
+use core::TimeDelta;
 
 #[derive(Parser)]
 #[command(name = "tdt")]
@@ -46,8 +46,12 @@ fn main() {
     match cli.command {
         Commands::Since { unit } => {
             let now = Utc::now();
-            let ticks = count_ticks(None, Some(now), &unit);
-            println!("Ticks since epoch ({unit}): {ticks}");
+            let epoch = NaiveDateTime::parse_from_str("1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S")
+                .unwrap()
+                .and_utc();
+
+            let td = TimeDelta::between(epoch, now);
+            println!("Ticks since epoch ({unit}): {}", td.ticks(&unit));
         }
 
         Commands::Between { start, end } => {
@@ -61,10 +65,15 @@ fn main() {
                     .and_utc()
             });
 
-            let output = pretty_breakdown(start_dt, end_dt, 3);
+            let td = if let Some(end_dt) = end_dt {
+                TimeDelta::between(start_dt, end_dt)
+            } else {
+                TimeDelta::until_now(start_dt)
+            };
 
-            println!("Between {} and {:?}: {}", start, end, output);
+            println!("Between {} and {:?}: {}", start, end, td.pretty(3));
         }
+
 
         Commands::Until { target, unit } => {
             let now = Utc::now();
@@ -75,18 +84,23 @@ fn main() {
             if target_dt < now {
                 println!("Target {} is in the past.", target);
             } else {
-                let ticks = count_ticks(Some(now), Some(target_dt), &unit);
-                println!("Until {}: {} {}", target, ticks, unit);
+                let td = TimeDelta::between(now, target_dt);
+                println!("Until {}: {} {}", target, td.ticks(&unit), unit);
             }
         }
 
-
         Commands::Clock => {
+            let epoch = NaiveDateTime::parse_from_str("1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S")
+                .unwrap()
+                .and_utc();
+
             loop {
                 let now = Utc::now();
-                let secs = count_ticks(None, Some(now), "seconds");
-                let millis = count_ticks(None, Some(now), "milliseconds");
-                let micros = count_ticks(None, Some(now), "microseconds");
+                let td = TimeDelta::between(epoch, now);
+
+                let secs = td.ticks("seconds");
+                let millis = td.ticks("milliseconds");
+                let micros = td.ticks("microseconds");
 
                 println!("Since epoch: {secs}s | {millis}ms | {micros}µs");
                 std::thread::sleep(std::time::Duration::from_secs(1));
