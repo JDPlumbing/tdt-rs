@@ -119,6 +119,7 @@ dependencies = [
  "iana-time-zone",
  "js-sys",
  "num-traits",
+ "serde",
  "wasm-bindgen",
  "windows-link 0.2.0",
 ]
@@ -598,11 +599,12 @@ dependencies = [
 
 [[package]]
 name = "tdt"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "chrono",
  "clap",
  "criterion",
+ "serde",
 ]
 
 [[package]]
