@@ -1,9 +1,11 @@
 use chrono::{DateTime, Utc};
 
+#[derive(Debug, Clone)]
 pub struct TimeDelta {
     start: DateTime<Utc>,
     end: DateTime<Utc>,
 }
+
 
 impl TimeDelta {
     pub fn from_now() -> Self {
