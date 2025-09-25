@@ -79,4 +79,23 @@ impl TimeDelta {
         }
         display.join(", ")
     }
+
+    pub fn from_ticks(ticks: i64, unit: &str) -> Self {
+        let duration = match unit {
+            "nanoseconds" => chrono::Duration::nanoseconds(ticks),
+            "microseconds" => chrono::Duration::microseconds(ticks),
+            "milliseconds" => chrono::Duration::milliseconds(ticks),
+            "seconds" => chrono::Duration::seconds(ticks),
+            "minutes" => chrono::Duration::minutes(ticks),
+            "hours" => chrono::Duration::hours(ticks),
+            _ => chrono::Duration::nanoseconds(ticks), // default fallback
+        };
+
+        let epoch = DateTime::<Utc>::from_timestamp(0, 0).unwrap();
+        Self {
+            start: epoch,
+            end: epoch + duration,
+        }
+    }
+
 }
